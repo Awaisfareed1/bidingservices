@@ -6,7 +6,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'cms.bidingservices.com',
+        hostname: 'shop.bidingservices.com',
       },
     ],
   },

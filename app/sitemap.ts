@@ -4,7 +4,6 @@ export default async function sitemap() {
   try {
     const endpoint = process.env.NEXT_PUBLIC_WORDPRESS_API_URL;
 
-    // ❌ If no endpoint, skip (prevents build crash)
     if (!endpoint) {
       console.warn('No WordPress API URL found');
       return [];
@@ -48,7 +47,6 @@ export default async function sitemap() {
   } catch (error) {
     console.error('Sitemap error:', error);
 
-    // ✅ IMPORTANT: Never crash build
     return [
       {
         url: 'https://bidingservices.com',
