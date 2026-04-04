@@ -1,13 +1,17 @@
 import { gql, GraphQLClient } from 'graphql-request';
 
-const endpoint =
-  process.env.NEXT_PUBLIC_WORDPRESS_API_URL ||
-  'http://localhost/wordpress/graphql';
-
-const client = new GraphQLClient(endpoint);
-
 export default async function sitemap() {
   try {
+    const endpoint = process.env.NEXT_PUBLIC_WORDPRESS_API_URL;
+
+    // ❌ If no endpoint, skip (prevents build crash)
+    if (!endpoint) {
+      console.warn('No WordPress API URL found');
+      return [];
+    }
+
+    const client = new GraphQLClient(endpoint);
+
     const query = gql`
       {
         posts {
@@ -20,10 +24,10 @@ export default async function sitemap() {
 
     const data = await client.request(query);
 
-    const posts = data.posts.nodes;
+    const posts = data?.posts?.nodes || [];
 
     const baseUrl =
-      process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+      process.env.NEXT_PUBLIC_SITE_URL || 'https://bidingservices.com';
 
     const postUrls = posts.map((post: any) => ({
       url: `${baseUrl}/blog/${post.slug}`,
@@ -42,8 +46,14 @@ export default async function sitemap() {
       ...postUrls,
     ];
   } catch (error) {
-    console.error('Sitemap generation failed:', error);
+    console.error('Sitemap error:', error);
 
-    return [];
+    // ✅ IMPORTANT: Never crash build
+    return [
+      {
+        url: 'https://bidingservices.com',
+        lastModified: new Date(),
+      },
+    ];
   }
 }
