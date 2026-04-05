@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Footer() {
   return (
     <footer className="bg-black text-white mt-10">
@@ -23,9 +25,9 @@ export default function Footer() {
 
         <div>
           <h3 className="font-semibold">Contact</h3>
-          <p className="text-sm mt-2">
-            email@example.com
-          </p>
+          <Link href="mailto:admin@bidingservices.com" className="text-sm mt-2">
+            admin@bidingservices.com
+          </Link>
         </div>
       </div>
 

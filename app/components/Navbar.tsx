@@ -11,7 +11,7 @@ export default function Navbar() {
       <div className="xl:max-w-7xl lg:max-w-4xl md:max-w-2xl mx-auto md:px-4 md:py-4 py-4 px-6 flex justify-between items-center">
         
         {/* Logo */}
-        <h1 className="text-xl font-bold">MySite</h1>
+        <h1 className="text-xl font-bold">Bidding Services</h1>
 
         {/* Desktop Menu */}
         <div className="hidden lg:flex space-x-6">
