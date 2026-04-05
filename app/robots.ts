@@ -6,6 +6,6 @@ export default function robots() {
         allow: '/',
       },
     ],
-    sitemap: 'http://localhost:3000/sitemap.xml',
+    sitemap: 'https://bidingservices.com/sitemap.xml',
   };
 }

@@ -8,13 +8,13 @@ export default function Navbar() {
 
   return (
     <nav className="bg-white shadow-md">
-      <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+      <div className="xl:max-w-7xl lg:max-w-4xl md:max-w-2xl mx-auto md:px-4 md:py-4 py-4 px-6 flex justify-between items-center">
         
         {/* Logo */}
         <h1 className="text-xl font-bold">MySite</h1>
 
         {/* Desktop Menu */}
-        <div className="hidden md:flex space-x-6">
+        <div className="hidden lg:flex space-x-6">
           <Link href="/">Home</Link>
           <Link href="/blog">Blogs</Link>
           <Link href="/about">About</Link>
@@ -24,7 +24,7 @@ export default function Navbar() {
 
         {/* Mobile Button */}
         <button
-          className="md:hidden"
+          className="lg:hidden text-2xl"
           onClick={() => setOpen(!open)}
         >
           ☰
@@ -32,15 +32,19 @@ export default function Navbar() {
       </div>
 
       {/* Mobile Menu */}
-      {open && (
-        <div className="md:hidden px-4 pb-4 space-y-2">
-          <Link href="/">Home</Link>
-          <Link href="/blog">Blogs</Link>
-          <Link href="/about">About</Link>
-          <Link href="/services">Services</Link>
-          <Link href="/contact">Contact</Link>
+      <div
+        className={`lg:hidden transition-all duration-300 overflow-hidden ${
+          open ? 'max-h-96' : 'max-h-0'
+        }`}
+      >
+        <div className="flex flex-col bg-white border-t">
+          <Link href="/" className="py-3 px-6 border-b">Home</Link>
+          <Link href="/blog" className="py-3 px-6 border-b">Blogs</Link>
+          <Link href="/about" className="py-3 px-6 border-b">About</Link>
+          <Link href="/services" className="py-3 px-6 border-b">Services</Link>
+          <Link href="/contact" className="py-3 px-6">Contact</Link>
         </div>
-      )}
+      </div>
     </nav>
   );
 }
