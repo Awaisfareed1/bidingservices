@@ -2,6 +2,7 @@ import './globals.css';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Script from 'next/script';
+import { Toaster } from 'react-hot-toast';
 
 export default function RootLayout({
   children,
@@ -9,7 +10,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body>
 
         {/* ✅ Google Analytics */}
@@ -34,6 +35,30 @@ export default function RootLayout({
         </main>
 
         <Footer />
+
+        {/* 🔥 TOASTER (added only this) */}
+        <Toaster
+          position="bottom-right" // ✅ changed from top-center
+          toastOptions={{
+            duration: 5000,
+            style: {
+              background: '#111',
+              color: '#fff',
+              border: '1px solid #222',
+              borderRadius: '10px',
+            },
+            success: {
+              style: {
+                background: '#16a34a',
+              },
+            },
+            error: {
+              style: {
+                background: '#dc2626',
+              },
+            },
+          }}
+        />
 
       </body>
     </html>

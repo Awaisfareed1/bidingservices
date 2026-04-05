@@ -1,94 +1,86 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
+import emailjs from '@emailjs/browser';
+import toast from 'react-hot-toast';
 
 export default function ContactForm() {
+  const formRef = useRef<HTMLFormElement>(null);
   const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState('');
 
-  async function handleSubmit(e: any) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    setStatus('');
 
-    const formData = new FormData(e.target);
+    if (!formRef.current) return;
 
-    const res = await fetch('/api/contact', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json', // ✅ important fix
-      },
-      body: JSON.stringify({
-        name: formData.get('name'),
-        email: formData.get('email'),
-        message: formData.get('message'),
-        service: formData.get('service'),
-      }),
-    });
+    try {
+      emailjs.init('Ky-7-ZgVdnt0OUYu4');
 
-    if (res.ok) {
-      setStatus('Message sent successfully!');
-      e.target.reset();
-    } else {
-      setStatus('Something went wrong.');
+      await emailjs.sendForm(
+        'service_hwjyc6t',
+        'template_cvngsp8',
+        formRef.current
+      );
+
+      toast.success('Message sent successfully!');
+      formRef.current.reset();
+
+    } catch (error: any) {
+      console.error(error);
+      toast.error('Failed to send message. Try again.');
     }
 
-    setTimeout(() => setStatus(''), 6000);
     setLoading(false);
   }
 
   return (
     <form
+      ref={formRef}
       onSubmit={handleSubmit}
-      className="max-w-2xl mx-auto space-y-5 bg-[#111] border border-[#222] p-8 rounded-2xl"
+      className="max-w-2xl mx-auto space-y-6 bg-[#111] border border-[#222] p-8 rounded-2xl shadow-xl"
     >
 
       <input
-        type="text"
         name="name"
-        placeholder="Your Name"
         required
-        className="w-full bg-[#0a0a0a] border border-[#222] px-4 py-3 rounded-lg focus:outline-none focus:border-purple-500 text-white"
+        placeholder="Your Name"
+        className="w-full bg-[#0a0a0a] border border-[#222] px-4 py-3 rounded-lg text-white focus:border-purple-500"
       />
 
       <input
-        type="email"
         name="email"
-        placeholder="Your Email"
+        type="email"
         required
-        className="w-full bg-[#0a0a0a] border border-[#222] px-4 py-3 rounded-lg focus:outline-none focus:border-purple-500 text-white"
+        placeholder="Your Email"
+        className="w-full bg-[#0a0a0a] border border-[#222] px-4 py-3 rounded-lg text-white focus:border-purple-500"
       />
 
       <select
         name="service"
-        className="w-full bg-[#0a0a0a] border border-[#222] px-4 py-3 rounded-lg focus:outline-none focus:border-purple-500 text-white"
+        className="w-full bg-[#0a0a0a] border border-[#222] px-4 py-3 rounded-lg text-white"
       >
         <option value="">Select Service</option>
-        <option value="Job Application">Job Application Service</option>
+        <option value="Job Application">Job Application</option>
         <option value="Resume Review">Resume Review</option>
         <option value="Consultation">Consultation</option>
       </select>
 
       <textarea
         name="message"
-        placeholder="Tell us about your goals..."
+        required
         rows={5}
-        className="w-full bg-[#0a0a0a] border border-[#222] px-4 py-3 rounded-lg focus:outline-none focus:border-purple-500 text-white"
+        placeholder="Tell us about your goals..."
+        className="w-full bg-[#0a0a0a] border border-[#222] px-4 py-3 rounded-lg text-white focus:border-purple-500"
       />
 
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-purple-600 hover:bg-purple-700 transition py-3 rounded-lg font-medium text-white"
+        className="w-full bg-purple-600 hover:bg-purple-700 py-3 rounded-lg text-white font-medium disabled:opacity-50"
       >
         {loading ? 'Sending...' : 'Submit'}
       </button>
-
-      {status && (
-        <p className="text-center text-sm text-green-400">
-          {status}
-        </p>
-      )}
 
     </form>
   );
