@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@giscus/react": "^3.1.0",
+    "framer-motion": "^12.38.0",
     "graphql-request": "^7.4.0",
     "next": "16.2.1",
     "nodemailer": "^8.0.4",
