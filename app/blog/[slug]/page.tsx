@@ -1,6 +1,7 @@
 import { gql, GraphQLClient } from 'graphql-request';
 import Container from '@/app/components/Container';
 import Image from 'next/image';
+import Link from 'next/link';
 
 const endpoint =
   process.env.NEXT_PUBLIC_WORDPRESS_API_URL ||
@@ -10,51 +11,6 @@ const client = new GraphQLClient(endpoint);
 
 export const revalidate = 60;
 
-// ✅ SEO METADATA
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
-  const { slug } = await params;
-
-  const query = gql`
-    query GetPostSEO($slug: ID!) {
-      post(id: $slug, idType: SLUG) {
-        title
-        excerpt
-        featuredImage {
-          node {
-            sourceUrl
-          }
-        }
-      }
-    }
-  `;
-
-  const data = await client.request(query, { slug });
-  const post = data.post;
-
-  if (!post) {
-    return { title: 'Post Not Found' };
-  }
-
-  const description = post.excerpt?.replace(/<[^>]+>/g, '') || '';
-
-  return {
-    title: post.title,
-    description,
-    openGraph: {
-      title: post.title,
-      description,
-      images: post.featuredImage?.node?.sourceUrl
-        ? [post.featuredImage.node.sourceUrl]
-        : [],
-    },
-  };
-}
-
-// ✅ PAGE
 export default async function PostPage({
   params,
 }: {
@@ -85,67 +41,104 @@ export default async function PostPage({
   const data = await client.request(query, { slug });
 
   if (!data?.post) {
-    return (
-      <main className="py-10">
-        <Container>
-          <h1 className="text-2xl font-bold">Post not found</h1>
-        </Container>
-      </main>
-    );
+    return <div>Post not found</div>;
   }
 
   const post = data.post;
 
-  const schema = {
-    '@context': 'https://schema.org',
-    '@type': 'Article',
-    headline: post.title,
-    image: post.featuredImage?.node?.sourceUrl || '',
-    datePublished: post.date,
-    author: {
-      '@type': 'Person',
-      name: post.author?.node?.name || 'Unknown',
-    },
-  };
-
   return (
     <main className="py-10">
       <Container>
-        <article className="max-w-3xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-10">
 
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-          />
+          {/* MAIN CONTENT */}
+          <article className="lg:col-span-3 max-w-3xl">
 
-          {post.featuredImage?.node?.sourceUrl && (
-            <div className="mb-6">
-              <Image
-                src={post.featuredImage.node.sourceUrl}
-                alt={post.title}
-                width={1200}
-                height={600}
-                className="rounded-xl w-full h-auto object-cover"
-                unoptimized
-              />
+            {/* Title */}
+            <h1 className="text-3xl md:text-4xl font-bold mb-4">
+              {post.title}
+            </h1>
+
+            {/* Meta */}
+            <p className="text-sm text-gray-500 mb-6">
+              By {post.author?.node?.name || 'Unknown'} •{' '}
+              {new Date(post.date).toDateString()}
+            </p>
+
+            {/* Image */}
+            {post.featuredImage?.node?.sourceUrl && (
+              <div className="mb-6">
+                <Image
+                  src={post.featuredImage.node.sourceUrl}
+                  alt={post.title}
+                  width={1200}
+                  height={600}
+                  className="rounded-xl w-full object-cover"
+                  unoptimized
+                />
+              </div>
+            )}
+
+            {/* Content */}
+            <div
+              className="prose prose-lg max-w-none"
+              dangerouslySetInnerHTML={{ __html: post.content }}
+            />
+
+            {/* 🔥 END CTA */}
+            <div className="mt-12 p-6 bg-black text-white rounded-xl">
+              <h3 className="text-xl font-semibold mb-2">
+                Want us to apply jobs for you?
+              </h3>
+              <p className="mb-4">
+                We apply to jobs daily on your behalf across multiple platforms.
+              </p>
+              <Link
+                href="/contact"
+                className="bg-white text-black px-5 py-2 rounded-lg font-medium"
+              >
+                Get Started
+              </Link>
             </div>
-          )}
 
-          <h1 className="text-3xl md:text-4xl font-bold mb-6">
-            {post.title}
-          </h1>
+          </article>
 
-          <p className="text-sm text-gray-500 mb-6">
-            By {post.author?.node?.name || 'Unknown'} •{' '}
-            {new Date(post.date).toLocaleDateString()}
-          </p>
+          {/* 🔥 SIDEBAR */}
+          <aside className="lg:col-span-1">
 
-          <div
-            className="prose prose-lg max-w-none"
-            dangerouslySetInnerHTML={{ __html: post.content }}
-          />
+            <div className="sticky top-24 space-y-6">
 
-        </article>
+              {/* CTA BOX */}
+              <div className="p-5 border rounded-xl shadow-sm">
+                <h4 className="font-semibold mb-2">
+                  Get More Job Responses
+                </h4>
+                <p className="text-sm mb-3">
+                  Let us handle your job applications professionally.
+                </p>
+                <Link
+                  href="/contact"
+                  className="block text-center bg-black text-white py-2 rounded-lg"
+                >
+                  Apply Now
+                </Link>
+              </div>
+
+              {/* SIMPLE RELATED (placeholder) */}
+              <div className="p-5 border rounded-xl">
+                <h4 className="font-semibold mb-3">Related Posts</h4>
+                <ul className="space-y-2 text-sm">
+                  <li>
+                    <Link href="/blog">View More Articles →</Link>
+                  </li>
+                </ul>
+              </div>
+
+            </div>
+
+          </aside>
+
+        </div>
       </Container>
     </main>
   );
