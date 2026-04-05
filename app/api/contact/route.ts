@@ -1,21 +1,29 @@
+// app/api/contact/route.ts
+
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
+
+export const runtime = 'nodejs'; // ✅ force node runtime
 
 export async function POST(req: Request) {
   try {
     const { name, email, message, service } = await req.json();
 
+    if (!name || !email || !message) {
+      return NextResponse.json({ success: false, error: 'Missing fields' }, { status: 400 });
+    }
+
     const transporter = nodemailer.createTransport({
       host: 'smtp.hostinger.com',
-      port: 465,
-      secure: true,
+      port: 587,
+      secure: false,
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
       },
     });
 
-    const mailOptions = {
+    await transporter.sendMail({
       from: `"Biding Services" <${process.env.EMAIL_USER}>`,
       to: process.env.EMAIL_TO,
       subject: `${service || 'General'} Inquiry from ${name}`,
@@ -27,13 +35,12 @@ export async function POST(req: Request) {
         <p><strong>Message:</strong></p>
         <p>${message}</p>
       `,
-    };
-
-    await transporter.sendMail(mailOptions);
+    });
 
     return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error('EMAIL ERROR:', error);
-    return NextResponse.json({ success: false }, { status: 500 });
+
+  } catch (error: any) {
+    console.error('EMAIL ERROR:', error?.message, error);
+    return NextResponse.json({ success: false, error: error?.message }, { status: 500 });
   }
 }
