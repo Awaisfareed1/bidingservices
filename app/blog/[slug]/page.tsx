@@ -2,7 +2,10 @@ import { gql, GraphQLClient } from 'graphql-request';
 import Container from '@/app/components/Container';
 import Image from 'next/image';
 
-const endpoint = 'http://localhost/wordpress/graphql';
+const endpoint =
+  process.env.NEXT_PUBLIC_WORDPRESS_API_URL ||
+  'https://shop.bidingservices.com/graphql';
+
 const client = new GraphQLClient(endpoint);
 
 export const revalidate = 60;
@@ -93,7 +96,6 @@ export default async function PostPage({
 
   const post = data.post;
 
-  // ✅ SCHEMA WITH REAL AUTHOR
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'Article',
@@ -111,13 +113,11 @@ export default async function PostPage({
       <Container>
         <article className="max-w-3xl mx-auto">
 
-          {/* ✅ Schema */}
           <script
             type="application/ld+json"
             dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
           />
 
-          {/* Featured Image */}
           {post.featuredImage?.node?.sourceUrl && (
             <div className="mb-6">
               <Image
@@ -131,18 +131,15 @@ export default async function PostPage({
             </div>
           )}
 
-          {/* Title */}
           <h1 className="text-3xl md:text-4xl font-bold mb-6">
             {post.title}
           </h1>
 
-          {/* Author + Date (nice UI upgrade) */}
           <p className="text-sm text-gray-500 mb-6">
             By {post.author?.node?.name || 'Unknown'} •{' '}
             {new Date(post.date).toLocaleDateString()}
           </p>
 
-          {/* Content */}
           <div
             className="prose prose-lg max-w-none"
             dangerouslySetInnerHTML={{ __html: post.content }}

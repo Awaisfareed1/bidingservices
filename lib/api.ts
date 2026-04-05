@@ -4,7 +4,6 @@ export async function getPosts() {
   try {
     const endpoint = process.env.NEXT_PUBLIC_WORDPRESS_API_URL;
 
-    // ❌ Prevent crash if env missing
     if (!endpoint) {
       console.warn('No WordPress API URL');
       return [];
@@ -31,7 +30,6 @@ export async function getPosts() {
   } catch (error) {
     console.error('Error fetching posts:', error);
 
-    // ✅ Prevent build crash
     return [];
   }
 }
